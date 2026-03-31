@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHOANGO Steam+ | Nền tảng Game Số 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #3b82f6;
+            --bg-dark: #0b141d;
+            --card-bg: rgba(23, 29, 37, 0.7);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: #c7d5e0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .btn-animate {
+            transition: all 0.2s ease;
+        }
+        .btn-animate:active {
+            transform: scale(0.92);
+        }
+        .nav-active {
+            color: var(--accent) !important;
+            position: relative;
+        }
+        .nav-active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .view-animate {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-dark); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    </style>
+</head>
+<body class="custom-scroll min-h-screen">
+
+    <!-- Thanh Điều Hướng -->
+    <header class="sticky top-0 z-50 glass-card border-b border-white/5 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-12">
+                <div onclick="showView('store')" class="flex items-center gap-3 cursor-pointer group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h1 class="text-2xl font-black italic tracking-tighter text-white">KHOANGO <span class="text-blue-500 underline decoration-blue-500/30">STEAM+</span></h1>
+                </div>
+                <nav class="hidden md:flex gap-10">
+                    <button onclick="showView('store')" id="nav-store" class="text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:text-blue-400">Cửa hàng</button>
+                    <button onclick="showView('library')" id="nav-library" class="text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:text-blue-400">Thư viện</button>
+                </nav>
+            </div>
+            
+            <div class="flex items-center gap-6">
+                <div class="text-right hidden sm:block bg-white/5 px-4 py-1.5 rounded-2xl border border-white/5">
+                    <p class="text-[9px] text-gray-500 font-black uppercase tracking-widest">Tài khoản</p>
+                    <p id="user-balance" class="text-sm font-black text-green-400">0đ</p>
+                </div>
+                <div onclick="showView('profile')" class="flex items-center gap-3 cursor-pointer p-1 pr-4 bg-blue-600/10 hover:bg-blue-600/20 rounded-full border border-blue-500/20 transition-all">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=KHOANGO" class="w-8 h-8 rounded-full border border-blue-500/50" alt="Avatar">
+                    <span class="text-xs font-black text-white hidden sm:inline uppercase">KHOANGO</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-6 py-10">
+        <!-- Nội dung render tại đây -->
+    </main>
+
+    <!-- Modal Thanh Toán -->
+    <div id="payment-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+        <div class="glass-card w-full max-w-md rounded-[40px] p-8 border-t-8 border-blue-600 shadow-2xl animate-scale-in">
+            <h3 class="text-2xl font-black text-white mb-2 uppercase italic tracking-tighter">Xác nhận thanh toán</h3>
+            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-8">Hóa đơn điện tử KHOANGO+</p>
+            
+            <div id="modal-game-info" class="bg-white/5 rounded-3xl p-5 mb-8 flex items-center gap-5 border border-white/5">
+                <!-- Info render -->
+            </div>
+
+            <div class="space-y-4 mb-10 px-2">
+                <div class="flex justify-between text-xs font-bold uppercase tracking-widest"><span class="text-gray-500">Giá sản phẩm</span><span id="modal-price" class="text-white"></span></div>
+                <div class="flex justify-between text-xs font-bold uppercase tracking-widest"><span class="text-gray-500">Thuế vùng</span><span class="text-white">MIỄN PHÍ</span></div>
+                <div class="pt-4 border-t border-white/10 flex justify-between items-center"><span class="text-white font-black italic">TỔNG CỘNG</span><span id="modal-total" class="text-2xl font-black text-blue-500"></span></div>
+            </div>
+
+            <div class="flex gap-4">
+                <button onclick="closeModal()" class="flex-1 py-5 rounded-2xl bg-white/5 text-gray-400 font-black text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">Hủy đơn</button>
+                <button id="confirm-buy-btn" class="flex-1 py-5 rounded-2xl bg-blue-600 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/30 hover:bg-blue-500 transition-all btn-animate">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thông báo Toast -->
+    <div id="toast-container" class="fixed top-24 right-8 z-[200] space-y-3 pointer-events-none"></div>
+
+    <script>
+        /**
+         * DANH SÁCH GAME ĐÃ CẬP NHẬT
+         */
+        const GAMES = [
+            { id: 'g1', title: 'TrọngBlack - Wukong', price: 1290000, img: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800', tags: ['Action', 'RPG'], bestSeller: true, url: '#' },
+            { id: 'g2', title: 'DinoGORILLA', price: 990000, img: 'https://images.unsplash.com/photo-1605898960710-9aa304381812?w=800', tags: ['Survival', 'Open World'], bestSeller: true, url: 'dino.html' },
+            { id: 'g3', title: 'Tiến Lên Miền Tây', price: 0, img: 'https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=800', tags: ['Card', 'Vietnamese'], bestSeller: false, url: 'bai.html' },
+            { id: 'g4', title: 'UNO VIP', price: 150000, img: 'https://images.unsplash.com/photo-1614680376593-902f74cf0d41?w=800', tags: ['Card', 'Fun'], bestSeller: false, url: '#' },
+            { id: 'g5', title: 'NhaccuaTAO', subtitle: 'Hợp tác với ZingMP4', price: 88000, img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800', tags: ['Music', 'App'], bestSeller: true, url: '#' }
+        ];
+
+        const CODES = { 'KHOANGO': 2000000, 'TRONGBLACK': 500000 };
+
+        let state = {
+            balance: 0,
+            ownedIds: [],
+            keys: [],
+            usedCodes: [],
+            currentView: 'store'
+        };
+
+        function showView(view) {
+            state.currentView = view;
+            const content = document.getElementById('main-content');
+            
+            document.querySelectorAll('nav button').forEach(b => {
+                b.classList.toggle('nav-active', b.id === `nav-${view}`);
+            });
+
+            content.classList.remove('view-animate');
+            void content.offsetWidth; 
+            content.classList.add('view-animate');
+
+            if (view === 'store') renderStore(content);
+            else if (view === 'library') renderLibrary(content);
+            else if (view === 'profile') renderProfile(content);
+        }
+
+        function renderStore(el) {
+            el.innerHTML = `
+                <div class="mb-14 relative h-[480px] rounded-[50px] overflow-hidden border border-white/5 group shadow-2xl">
+                    <img src="${GAMES[0].img}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105 opacity-40">
+                    <div class="absolute inset-0 bg-gradient-to-t from-var(--bg-dark) via-transparent to-transparent"></div>
+                    <div class="absolute bottom-16 left-16 max-w-2xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="bg-blue-600/20 text-blue-400 text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] border border-blue-500/30">Siêu phẩm đề cử</span>
+                        </div>
+                        <h2 class="text-7xl font-black text-white italic tracking-tighter mb-8 uppercase leading-none">${GAMES[0].title}</h2>
+                        <div class="flex items-center gap-8">
+                            <button onclick="openBuyModal('${GAMES[0].id}')" class="btn-animate py-5 px-12 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-3xl shadow-2xl shadow-blue-600/30 uppercase tracking-widest text-[11px]">Mua bản quyền</button>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] text-gray-500 font-black uppercase">Giá hiện tại</span>
+                                <span class="text-3xl font-black text-white italic">${GAMES[0].price.toLocaleString()}đ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-end mb-12">
+                    <div class="space-y-2">
+                        <h3 class="text-3xl font-black text-white uppercase italic tracking-tighter">Kho Game <span class="text-blue-500">KHOANGO+</span></h3>
+                        <p class="text-gray-500 text-xs font-bold uppercase tracking-widest">Sản phẩm chất lượng cao • Uy tín hàng đầu</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    ${GAMES.map(g => `
+                        <div class="game-card glass-card rounded-[40px] overflow-hidden group cursor-pointer border border-white/5" onclick="openBuyModal('${g.id}')">
+                            <div class="relative aspect-[4/5] overflow-hidden m-2 rounded-[32px]">
+                                <img src="${g.img}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center p-8">
+                                    <span class="bg-white text-black font-black w-full py-4 rounded-2xl text-[10px] uppercase tracking-widest text-center translate-y-4 group-hover:translate-y-0 transition-transform">Đặt mua ngay</span>
+                                </div>
+                                ${g.bestSeller ? '<div class="absolute top-4 left-4 bg-orange-500 text-[8px] font-black px-3 py-1.5 rounded-xl text-white uppercase tracking-widest shadow-lg">Trending</div>' : ''}
+                            </div>
+                            <div class="p-6">
+                                <h4 class="text-white font-black text-base truncate mb-1 uppercase italic">${g.title}</h4>
+                                <p class="text-[9px] text-gray-500 font-bold uppercase mb-5">${g.subtitle || g.tags.join(' / ')}</p>
+                                <div class="flex justify-between items-center bg-white/5 p-3 rounded-2xl border border-white/5">
+                                    <span class="text-blue-400 font-black text-sm">${g.price === 0 ? 'MIỄN PHÍ' : g.price.toLocaleString() + 'đ'}</span>
+                                    ${state.ownedIds.includes(g.id) ? 
+                                        '<span class="text-[8px] font-black text-green-500 uppercase tracking-widest">Đã sở hữu</span>' : 
+                                        '<div class="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-500 group-hover:bg-blue-600 group-hover:text-white transition-all"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>'}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderLibrary(el) {
+            const myGames = GAMES.filter(g => state.ownedIds.includes(g.id));
+            el.innerHTML = `
+                <div class="flex flex-col mb-12">
+                    <h2 class="text-5xl font-black text-white italic uppercase tracking-tighter mb-2">Thư viện của tôi</h2>
+                    <p class="text-blue-500 text-[10px] font-black uppercase tracking-[0.3em]">Kho lưu trữ cá nhân • KHOANGO STEAM+</p>
+                </div>
+                ${myGames.length > 0 ? `
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                        ${myGames.map(g => `
+                            <div class="glass-card rounded-[45px] overflow-hidden p-4 group border border-white/5 hover:border-green-500/20">
+                                <div class="relative rounded-[32px] overflow-hidden mb-6">
+                                    <img src="${g.img}" class="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500">
+                                    <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                                </div>
+                                <div class="px-4 pb-4">
+                                    <h3 class="text-2xl font-black text-white truncate mb-2 uppercase italic tracking-tighter">${g.title}</h3>
+                                    <div class="flex gap-4 mb-8">
+                                        <div class="flex flex-col"><span class="text-[8px] text-gray-500 font-bold uppercase">Thời gian</span><span class="text-xs text-white font-black">0 Giờ</span></div>
+                                        <div class="flex flex-col"><span class="text-[8px] text-gray-500 font-bold uppercase">Trạng thái</span><span class="text-xs text-green-500 font-black">Sẵn sàng</span></div>
+                                    </div>
+                                    <button onclick="playGame('${g.url}')" class="btn-animate w-full py-5 bg-green-600 hover:bg-green-500 text-white font-black rounded-3xl shadow-xl shadow-green-600/10 transition-all uppercase text-[10px] tracking-[0.2em]">Khởi chạy ứng dụng</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : `
+                    <div class="flex flex-col items-center justify-center py-40 bg-white/2 rounded-[60px] border border-white/5">
+                        <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-8 border border-white/5">
+                            <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        </div>
+                        <p class="text-gray-500 font-black uppercase text-xs mb-8 tracking-[0.2em]">Thư viện đang trống rỗng</p>
+                        <button onclick="showView('store')" class="btn-animate px-12 py-4 bg-white text-black font-black rounded-2xl text-[10px] uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-xl">Ghé Cửa Hàng</button>
+                    </div>
+                `}
+            `;
+        }
+
+        function renderProfile(el) {
+            el.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    <div class="lg:col-span-1 space-y-8">
+                        <div class="glass-card p-12 rounded-[50px] text-center relative overflow-hidden border border-white/5">
+                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                            <div class="relative w-36 h-36 mx-auto mb-8 group">
+                                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=KHOANGO" class="w-full h-full rounded-full border-4 border-blue-500 p-1.5 bg-var(--bg-dark)">
+                                <div class="absolute bottom-2 right-2 w-7 h-7 bg-green-500 border-4 border-var(--bg-dark) rounded-full shadow-lg"></div>
+                            </div>
+                            <h3 class="text-3xl font-black text-white italic tracking-tighter mb-1 uppercase">KHOANGO</h3>
+                            <p class="text-[10px] text-blue-500 font-black uppercase tracking-[0.3em] mb-10">Bạch Kim Member</p>
+                            
+                            <div class="grid grid-cols-2 gap-4 border-t border-white/5 pt-10">
+                                <div class="bg-white/5 p-4 rounded-3xl"><p class="text-[9px] text-gray-500 font-black uppercase mb-1">Cấp</p><p class="text-2xl font-black text-white italic">99</p></div>
+                                <div class="bg-white/5 p-4 rounded-3xl"><p class="text-[9px] text-gray-500 font-black uppercase mb-1">Items</p><p class="text-2xl font-black text-white italic">24</p></div>
+                            </div>
+                        </div>
+                        
+                        <div class="glass-card p-10 rounded-[45px] border border-white/5">
+                            <h4 class="text-xs font-black text-white uppercase mb-8 flex items-center gap-3 italic">
+                                <span class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span> Nạp Giftcode KHOANGO+
+                            </h4>
+                            <div class="space-y-4">
+                                <input id="code-input" type="text" placeholder="Nhập mã ưu đãi..." class="w-full bg-black/60 border border-white/10 rounded-2xl py-5 px-8 text-white font-black placeholder:text-gray-700 focus:border-blue-600 outline-none transition-all uppercase text-sm tracking-widest">
+                                <button onclick="redeemCode()" class="btn-animate w-full py-5 bg-white text-black font-black rounded-3xl hover:bg-blue-600 hover:text-white transition-all text-[10px] uppercase tracking-[0.2em] shadow-lg">Xác nhận nạp ví</button>
+                            </div>
+                            <div class="mt-6 p-4 bg-blue-500/5 rounded-2xl border border-blue-500/10">
+                                <p class="text-[9px] text-blue-400 font-black uppercase text-center tracking-widest">Gợi ý: Dùng code "KHOANGO" (2trđ)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="glass-card p-12 rounded-[55px] border border-white/5">
+                            <h3 class="text-2xl font-black text-white uppercase italic tracking-tighter mb-10">Kích hoạt Bản Quyền Số</h3>
+                            <div class="flex flex-col sm:flex-row gap-5 mb-14">
+                                <input id="key-input" type="text" placeholder="KNST-XXXX-XXXX-XXXX" class="flex-1 bg-black/60 border border-white/10 rounded-3xl py-5 px-10 text-blue-400 font-mono font-black placeholder:text-gray-700 focus:border-blue-600 outline-none transition-all uppercase tracking-widest">
+                                <button onclick="activateKey()" class="btn-animate px-12 bg-blue-600 text-white font-black rounded-3xl hover:bg-blue-500 transition-all text-[10px] uppercase tracking-widest shadow-xl shadow-blue-500/20">Kích hoạt</button>
+                            </div>
+
+                            <div class="relative">
+                                <div class="flex justify-between items-center mb-8 border-b border-white/5 pb-6">
+                                    <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Lịch sử giao dịch & Key</p>
+                                    <span class="text-[9px] text-gray-700 font-bold uppercase italic">Chế độ bảo mật ON</span>
+                                </div>
+                                ${state.keys.length > 0 ? `
+                                    <div class="grid grid-cols-1 gap-4">
+                                        ${state.keys.slice().reverse().map(k => `
+                                            <div class="flex items-center justify-between p-6 bg-white/5 rounded-[32px] border border-white/5 hover:bg-white/10 transition-all group">
+                                                <div class="flex items-center gap-6">
+                                                    <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500 shadow-inner">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-white font-black text-sm uppercase italic tracking-tighter">${k.gameTitle}</p>
+                                                        <p class="text-blue-500/50 font-mono text-[10px] font-bold tracking-tighter mt-1">KNST-${k.key.substring(5)}</p>
+                                                    </div>
+                                                </div>
+                                                <button onclick="copyText('${k.key}')" class="text-[10px] font-black text-white/30 hover:text-blue-400 uppercase tracking-widest transition-colors px-6 py-2 rounded-xl border border-white/5 hover:border-blue-400/50">Copy</button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                ` : `
+                                    <div class="text-center py-24 opacity-20 flex flex-col items-center">
+                                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        <p class="text-sm font-black uppercase tracking-widest italic">Chưa phát sinh giao dịch</p>
+                                    </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- HÀNH ĐỘNG HỆ THỐNG ---
+
+        function openBuyModal(gameId) {
+            if (state.ownedIds.includes(gameId)) return toast("Đã có trong thư viện!", "info");
+            const game = GAMES.find(g => g.id === gameId);
+            const modal = document.getElementById('payment-modal');
+            const info = document.getElementById('modal-game-info');
+            
+            info.innerHTML = `
+                <img src="${game.img}" class="w-24 h-24 rounded-[28px] object-cover shadow-xl">
+                <div>
+                    <p class="text-white font-black text-xl italic uppercase tracking-tighter mb-1">${game.title}</p>
+                    <p class="text-[9px] text-blue-500 font-black uppercase tracking-[0.2em]">${game.subtitle || 'KHOANGO+ Digital Content'}</p>
+                </div>
+            `;
+            document.getElementById('modal-price').innerText = game.price.toLocaleString() + 'đ';
+            document.getElementById('modal-total').innerText = game.price.toLocaleString() + 'đ';
+            
+            document.getElementById('confirm-buy-btn').onclick = () => processPurchase(game);
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('payment-modal').classList.add('hidden');
+        }
+
+        function processPurchase(game) {
+            if (state.balance < game.price) return toast("Tài khoản không đủ lúa!", "error");
+
+            const newKey = `KNST-${Math.random().toString(36).substring(2,6).toUpperCase()}-${Math.random().toString(36).substring(2,6).toUpperCase()}-${Math.random().toString(36).substring(2,6).toUpperCase()}`;
+            
+            state.balance -= game.price;
+            state.keys.push({ gameId: game.id, gameTitle: game.title, key: newKey });
+            
+            closeModal();
+            updateBalanceUI();
+            toast("Thanh toán thành công! Key đã được lưu.");
+            showView('profile');
+        }
+
+        function redeemCode() {
+            const val = document.getElementById('code-input').value.trim().toUpperCase();
+            if (state.usedCodes.includes(val)) return toast("Code này dùng rồi!", "error");
+            
+            const amount = CODES[val];
+            if (amount) {
+                state.balance += amount;
+                state.usedCodes.push(val);
+                updateBalanceUI();
+                toast(`Đã nạp +${amount.toLocaleString()}đ vào ví!`);
+                renderProfile(document.getElementById('main-content'));
+            } else {
+                toast("Mã nạp không tồn tại.", "error");
+            }
+        }
+
+        function activateKey() {
+            const val = document.getElementById('key-input').value.trim().toUpperCase();
+            const keyRecord = state.keys.find(k => k.key === val);
+            
+            if (!keyRecord) return toast("Mã Key không hợp lệ.", "error");
+            if (state.ownedIds.includes(keyRecord.gameId)) return toast("Đã kích hoạt trước đó rồi.", "info");
+
+            state.ownedIds.push(keyRecord.gameId);
+            toast(`Đã thêm ${keyRecord.gameTitle} vào thư viện!`);
+            document.getElementById('key-input').value = '';
+            renderProfile(document.getElementById('main-content'));
+        }
+
+        function playGame(url) {
+            toast("Đang đồng bộ dữ liệu đám mây...");
+            setTimeout(() => {
+                if (!url || url === '#') toast("Hệ thống game đang bảo trì!", "info");
+                else window.open(url, '_blank');
+            }, 1000);
+        }
+
+        function updateBalanceUI() {
+            document.getElementById('user-balance').innerText = state.balance.toLocaleString() + 'đ';
+        }
+
+        function toast(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const div = document.createElement('div');
+            const colors = {
+                'success': 'bg-blue-600 border-blue-400',
+                'error': 'bg-red-600 border-red-400',
+                'info': 'bg-gray-800 border-gray-600'
+            };
+            
+            div.className = `${colors[type] || colors.success} text-white px-8 py-5 rounded-[24px] shadow-2xl border font-black text-[10px] uppercase tracking-widest flex items-center gap-4 animate-slide-in pointer-events-auto`;
+            div.innerHTML = `
+                <div class="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a8 8 0 100 16 8 8 0 000-16zm3 5a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L8.5 10.086l3.293-3.293A1 1 0 0113 7z"></path></svg>
+                </div>
+                ${msg}
+            `;
+            container.appendChild(div);
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transform = 'translateY(-20px)';
+                setTimeout(() => div.remove(), 500);
+            }, 3000);
+        }
+
+        function copyText(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            toast("Đã copy key!");
+        }
+
+        window.onload = () => {
+            updateBalanceUI();
+            showView('store');
+        };
+    </script>
+    
+    <style>
+        @keyframes slide-in {
+            from { transform: translateX(100%) scale(0.9); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        .animate-slide-in { animation: slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes scale-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-scale-in { animation: scale-in 0.2s ease-out forwards; }
+    </style>
+</body>
+</html>
